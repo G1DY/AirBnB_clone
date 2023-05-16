@@ -1,52 +1,78 @@
 #!/usr/bin/python3
-''' 
-module for BaseModel class 
-'''
+"""
+Custom base class for the entire project
+"""
 
-#libraries
-from datetime import datetime
 from uuid import uuid4
-from . import storage
-
-ISOFORMAT = "%Y-%m-%dT%H:%M:%S.%f"
+from datetime import datetime
+import models
 
 class BaseModel:
-    ''' class of the base model that everyhting else is inheriting from'''
-    def __init__(self, *args, **kwargs):
-        if kwargs:
-            for k in kwargs:
-                if k in ['created_at', 'updated_at']:
-                    setattr(self, k, datetime.strptime(kwargs[k], ISOFORMAT))
-                elif k != '__class__':
-                    setattr(self, k, kwargs[k])
+    """Custom base for all the classes in the AirBnb console project
 
-        else:
+    Arttributes:
+        id(str): handles unique user identity
+        created_at: assigns current datetime
+        updated_at: updates current datetime
+
+    Methods:
+        __str__: prints the class name, id, and creates dictionary
+        representations of the input values
+        save(self): updates instance arttributes with current datetime
+        to_dict(self): returns the dictionary values of the instance obj
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Public instance artributes initialization
+        after creation
+
+        Args:
+            *args(args): arguments
+            **kwargs(dict): attrubute values
+
+        """
+        DATE_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+        if not kwargs:
             self.id = str(uuid4())
             self.created_at = datetime.utcnow()
-            self.updated_at = self.created_at.replace()
-            storage.new(self)
-        
-    def save(self):
-        '''
-        updates the public instance attribute updated_at with the current datetime 
-        and should save the model, I don't know why they asked us to call it save
-        we might probably update this later
-        '''
-        self.updated_at=datetime.utcnow()
-        storage.save()
-
-    def to_dict(self):
-        '''
-        returns a dictionary containing all keys/values of __dict__ of the model
-        '''
-        dct= self.__dict__.copy()
-        dct['__class__'] = self.__class__.__name__
-        dct['created_at'] = self.created_at.isoformat()
-        dct['updated_at'] = self.updated_at.isoformat()
-        return dct
+            self.updated_at = datetime.utcnow()
+            models.storage.new(self)
+        else:
+            for key, value in kwargs.items():
+                if key in ("updated_at", "created_at"):
+                    self.__dict__[key] = datetime.strptime(
+                        value, DATE_TIME_FORMAT)
+                elif key[0] == "id":
+                    self.__dict__[key] = str(value)
+                else:
+                    self.__dict__[key] = value
 
     def __str__(self):
-        '''
-        returns a string representation of the model when an instance is created
-        '''
-        return '[{}] [{}] {}'.format(self.__class__.__name__, self.id, self.__dict__)
+        """
+        Returns string representation of the class
+        """
+        return "[{}] ({}) {}".format(self.__class__.__name__,
+                                     self.id, self.__dict__)
+
+    def save(self):
+        """
+        Updates the public instance attribute:
+        'updated_at' - with the current datetime
+        """
+        self.updated_at = datetime.utcnow()
+        models.storage.save()
+
+    def to_dict(self):
+        """
+        Method returns a dictionary containing all 
+        keys/values of __dict__ instance
+        """
+        map_objects = {}
+        for key, value in self.__dict__.items():
+            if key == "created_at" or key == "updated_at":
+                map_objects[key] = value.isoformat()
+            else:
+                map_objects[key] = value
+        map_objects["__class__"] = self.__class__.__name__
+        return map_objects
