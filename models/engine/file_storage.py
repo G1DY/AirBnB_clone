@@ -58,18 +58,18 @@ class FileStorage:
     def attributes(self):
         """returns attributes of classes defined"""
         attributes = {
-            "BaseModel": 
+            "BaseModel":
                      {"id": str,
                       "created_at": datetime.datetime,
                       "updated_at": datetime.datetime},
-            "User": 
+            "User":
                      {"email": str,
                       "password": str,
                       "first_name": str,
                       "last_name": str},
             "State":
                      {"name": str},
-            "City": 
+            "City":
                      {"state_id": str,
                       "name": str},
             "Amenity":
