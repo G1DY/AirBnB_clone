@@ -12,39 +12,42 @@ from models.review import Review
 from models.amenity import Amenity
 from models.city import City
 
-    def parse(arg):
-        curly_braces = re.search(r"\{(.*?)\}", arg)
-        brackets = re.search(r"\[(.*?)\]", arg)
-        if curly_braces is None:
-            if brackets is None:
-                return [i.strip(",") for i in split(arg)]
-            else:
-                lexer = split(arg[:brackets.span()[0]])
-                r1 = [i.strip(",") for i in lexer]
-                r1.append(brackets.group())
-                return r1
+
+def parse(arg):
+    curly_braces = re.search(r"\{(.*?)\}", arg)
+    brackets = re.search(r"\[(.*?)\]", arg)
+    if curly_braces is None:
+        if brackets is None:
+            return [i.strip(",") for i in split(arg)]
         else:
-            lexer = split(arg[:curly_braces.span()[0]])
+            lexer = split(arg[:brackets.span()[0]])
             retl = [i.strip(",") for i in lexer]
-            retl.append(curly_braces.group())
-            return r1
+            retl.append(brackets.group())
+            return retl
+    else:
+        lexer = split(arg[:curly_braces.span()[0]])
+        retl = [i.strip(",") for i in lexer]
+        retl.append(curly_braces.group())
+        return retl
 
-    class HBNBCommand(cmd.Cmd):
-        """defines the HBnB command interpreter
-        Attribute:
-            prompt: command prompt string
-        """
 
-        prompt = "(hbnb) "
-        __classes = {
-            "BaseModel",
-            "User",
-            "Place",
-            "City",
-            "State",
-            "Amenity",
-            "Review"
-        }
+class HBNBCommand(cmd.Cmd):
+    """Defines the HBnB command interpreter.
+
+    Attributes:
+        prompt (str): The command prompt.
+    """
+
+    prompt = "(hbnb) "
+    __classes = {
+        "BaseModel",
+        "User",
+        "State",
+        "City",
+        "Place",
+        "Amenity",
+        "Review"
+    }
 
     def emptyline(self):
         """executes nothing"""
@@ -188,6 +191,7 @@ from models.city import City
                 else:
                     obj.__dict__[k] = v
         storage.save()
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
