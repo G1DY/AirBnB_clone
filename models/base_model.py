@@ -3,7 +3,7 @@
    contains the AirBnB base class
 """
 
-import uuid
+from uuid import uuid4
 from datetime import datetime
 from models import storage
 
